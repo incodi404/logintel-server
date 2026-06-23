@@ -1,0 +1,127 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 15672:15672
+      - 5672:5672
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password@321
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_log:/var/log/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  central-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: central_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - central_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d central_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: es-dev
+    environment:
+      # Tells ES "don't try to form a cluster, I'm alone"
+      # Disables master election — skips bootstrap checks for prod
+      - discovery.type=single-node
+
+      # ES 8 ships with security ON by default.
+      # For local dev you may want to disable it to avoid
+      # managing certs and passwords. NEVER do this in prod.
+      - xpack.security.enabled=false
+
+      # Heap: set both Xms and Xmx to the SAME value.
+      # Dev: 512m is enough. Avoids JVM resizing the heap at runtime.
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+
+      # Human-readable cluster name. Shows in logs, Kibana.
+      - cluster.name=dev-cluster
+
+      # Node name. Defaults to container hostname if unset.
+      - node.name=es-dev-node1
+
+    ports:
+      # 9200 = REST API (your Go code hits this)
+      # 9300 = internal transport (node-to-node). Expose only
+      # if you have multi-node on host network.
+      - 9200:9200
+
+    volumes:
+      # Named volume = data survives container restart.
+      # Without this, you lose all indexed data on 'docker compose down'.
+      - es-dev-data:/usr/share/elasticsearch/data
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fs http://localhost:9200/_cluster/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  nats:
+    image: nats:2.10-alpine
+    command: ["-js", "-m", "8222"] # -js: Jetstream -m: monitoring port 8222
+    ports:
+      - 8222:8222
+      - 4222:4222
+    volumes:
+      - nats_data:/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --spider -q http://localhost:8222/healthz || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  log-ingestion:
+    build:
+      context: ./services/log-ingestion
+      target: dev
+    ports:
+      - 5051:5051
+    env_file:
+      - ./services/log-ingestion/.env
+    depends_on:
+      central-db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    volumes:
+      - ./services/log-ingestion:/app
+
+volumes:
+  rabbitmq_data:
+  rabbitmq_log:
+  es-dev-data:
+  central_db_data:
+  nats_data:
