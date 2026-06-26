@@ -12,6 +12,7 @@ message ExecLog {
     uint32 uid = 4;
     string comm = 5;
     google.protobuf.Timestamp timestamp = 6;
+    string agentId = 7;
 }
 
 // server side

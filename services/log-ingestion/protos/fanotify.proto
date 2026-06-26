@@ -12,6 +12,7 @@ message FanotifyLog {
     google.protobuf.Timestamp timestamp = 5;
     string path = 6;
     repeated string events = 7;
+    string agentId = 8;
 }
 
 message FanotifyAck {

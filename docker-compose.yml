@@ -1,6 +1,7 @@
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
     ports:
       - 15672:15672
       - 5672:5672
@@ -19,6 +20,7 @@ services:
 
   central-db:
     image: postgres:15
+    container_name: central-db
     environment:
       POSTGRES_DB: central_db
       POSTGRES_USER: postgres
@@ -82,8 +84,19 @@ services:
       retries: 5
       start_period: 40s
 
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
   nats:
     image: nats:2.10-alpine
+    container_name: nats
     command: ["-js", "-m", "8222"] # -js: Jetstream -m: monitoring port 8222
     ports:
       - 8222:8222
@@ -102,6 +115,7 @@ services:
       start_period: 10s
 
   log-ingestion:
+    container_name: log-ingestion
     build:
       context: ./services/log-ingestion
       target: dev

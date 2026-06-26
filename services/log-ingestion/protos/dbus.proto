@@ -15,7 +15,8 @@ message DbusUnitLog {
     uint32 jobId = 8;
     string jobType = 9;
     string jobPath = 10;
-    google.protobuf.Timestamp timestamp = 11; 
+    google.protobuf.Timestamp timestamp = 11;
+    string agentId = 12;
 }
 
 message DbusUnitAck {

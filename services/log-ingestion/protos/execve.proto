@@ -10,6 +10,7 @@ message ExecveLog {
     string comm = 3;
     int64 parent_process = 4;
     google.protobuf.Timestamp timestamp = 5;
+    string agentId = 6;
 }
 
 message ExecveAck {

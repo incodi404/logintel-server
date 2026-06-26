@@ -18,6 +18,7 @@ message ISSSLog {
     string comm = 11;
     int64 parent_process = 12;
     google.protobuf.Timestamp timestamp = 13;
+    string agentId = 14;
 }
 
 message Connect4Log {
@@ -33,6 +34,7 @@ message Connect4Log {
     string name  = 10;
     string comm = 11;
     int64 parent_process = 12;
+    string agentId = 13;
 }
 
 message Bind4Log {
@@ -48,6 +50,7 @@ message Bind4Log {
     string name  = 10;
     string comm = 11;
     int64 parent_process = 12;
+    string agentId = 13;
 }
 
 message ISSSAck {
