@@ -5,6 +5,7 @@ import (
 	"io"
 	"log-ingestion/models"
 	"log-ingestion/pb"
+	"log-ingestion/utils"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -46,7 +47,7 @@ func (s *DbusUnitUploaderServer) DbusUnitUpload(stream pb.DbusUbitUploader_DbusU
 			JobId:       chunk.JobId,
 			JobType:     chunk.JobType,
 			JobPath:     chunk.JobPath,
-			Timestamp:   chunk.Timestamp,
+			Timestamp:   utils.TimestampToUTC(chunk.Timestamp.Seconds, int64(chunk.Timestamp.Nanos)),
 		}
 	}
 }

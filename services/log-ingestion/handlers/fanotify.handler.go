@@ -5,6 +5,7 @@ import (
 	"io"
 	"log-ingestion/models"
 	"log-ingestion/pb"
+	"log-ingestion/utils"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -35,7 +36,7 @@ func (s *FanotifyUploaderServer) FanotifyUpload(stream pb.FanotifyUploader_Fanot
 
 		s.Stream <- models.FanotifyRecord{
 			Comm:      chunk.Comm,
-			Timestamp: chunk.Timestamp,
+			Timestamp: utils.TimestampToUTC(chunk.Timestamp.Seconds, int64(chunk.Timestamp.Nanos)),
 			AgentId:   chunk.AgentId,
 			Pid:       chunk.Pid,
 			Name:      chunk.Name,

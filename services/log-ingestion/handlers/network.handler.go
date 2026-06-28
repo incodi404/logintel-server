@@ -5,6 +5,7 @@ import (
 	"io"
 	"log-ingestion/models"
 	"log-ingestion/pb"
+	"log-ingestion/utils"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -37,7 +38,7 @@ func (s *NetworkUploaderServer) ISSSUpload(stream pb.NetworkLogUploader_ISSSUplo
 
 		s.ISSSStream <- models.ISSSRecord{
 			Comm:      chunk.Comm,
-			Timestamp: chunk.Timestamp,
+			Timestamp: utils.TimestampToUTC(chunk.Timestamp.Seconds, int64(chunk.Timestamp.Nanos)),
 			AgentId:   chunk.AgentId,
 			OldState:  chunk.OldState,
 			NewState:  chunk.NewState,
@@ -84,7 +85,7 @@ func (s *NetworkUploaderServer) Connect4Upload(stream pb.NetworkLogUploader_Conn
 			Name:       chunk.Name,
 			Comm:       chunk.Comm,
 			PPid:       chunk.ParentProcess,
-			Timestamp:  chunk.Timestamp,
+			Timestamp:  utils.TimestampToUTC(chunk.Timestamp.Seconds, int64(chunk.Timestamp.Nanos)),
 			AgentId:    chunk.AgentId,
 		}
 	}
@@ -120,7 +121,7 @@ func (s *NetworkUploaderServer) Bind4Upload(stream pb.NetworkLogUploader_Bind4Up
 			Name:       chunk.Name,
 			Comm:       chunk.Comm,
 			PPid:       chunk.ParentProcess,
-			Timestamp:  chunk.Timestamp,
+			Timestamp:  utils.TimestampToUTC(chunk.Timestamp.Seconds, int64(chunk.Timestamp.Nanos)),
 			AgentId:    chunk.AgentId,
 		}
 	}

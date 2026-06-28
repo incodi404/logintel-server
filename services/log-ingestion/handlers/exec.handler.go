@@ -5,6 +5,7 @@ import (
 	"io"
 	"log-ingestion/models"
 	"log-ingestion/pb"
+	"log-ingestion/utils"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -39,7 +40,7 @@ func (s *ExecUploaderServer) ExecUpload(stream pb.ExecLogUploader_ExecUploadServ
 			OldPid:    chunk.OldPid,
 			Uid:       chunk.Uid,
 			Comm:      chunk.Comm,
-			Timestamp: chunk.Timestamp,
+			Timestamp: utils.TimestampToUTC(chunk.Timestamp.Seconds, int64(chunk.Timestamp.Nanos)),
 			AgentId:   chunk.AgentId,
 		}
 	}
