@@ -3,6 +3,7 @@ package streamer
 import (
 	"context"
 	"fmt"
+	"log-ingestion/elasticsearch"
 	"log-ingestion/models"
 	"log-ingestion/utils"
 	"os"
@@ -25,6 +26,8 @@ func ISSSStreamer(
 
 	ticker := time.NewTicker(time.Duration(logProcessTimeNum) * time.Second)
 	defer ticker.Stop()
+
+	esInstance := elasticsearch.Get()
 
 	// batch of logs
 	var logBatch []models.ISSSRecord
@@ -51,7 +54,13 @@ func ISSSStreamer(
 			}
 
 			fmt.Println("[INFO] Running log batch after 5 sec: ", len(logBatch))
-			fmt.Println(logBatch)
+			// fmt.Println(logBatch)
+			if err := elasticsearch.BulkIndex(
+				ctx, esInstance, elasticsearch.ISSSIndexConfig.IndexName, logBatch,
+			); err != nil {
+				errCh <- fmt.Errorf("[ES ERROR] Error occured while uploading ISSS logs: %w", err)
+			}
+			fmt.Println("[INFO] Logs uploaded!")
 			logBatch = nil
 		}
 	}
@@ -73,6 +82,8 @@ func Connect4Streamer(
 	ticker := time.NewTicker(time.Duration(logProcessTimeNum) * time.Second)
 	defer ticker.Stop()
 
+	esInstance := elasticsearch.Get()
+
 	// batch of logs
 	var logBatch []models.Connect4Record
 
@@ -89,7 +100,7 @@ func Connect4Streamer(
 				errCh <- fmt.Errorf("[ERROR] Error occured in Connect4Streamer log fetch")
 			}
 
-			fmt.Println("[INFO] Connect4 log received")
+			// fmt.Println("[INFO] Connect4 log received")
 			logBatch = append(logBatch, log)
 
 		case <-ticker.C:
@@ -98,7 +109,12 @@ func Connect4Streamer(
 			}
 
 			fmt.Println("[INFO] Running log batch after 5 sec: ", len(logBatch))
-			fmt.Println(logBatch)
+			if err := elasticsearch.BulkIndex(
+				ctx, esInstance, elasticsearch.Connect4IndexConfig.IndexName, logBatch,
+			); err != nil {
+				errCh <- fmt.Errorf("[ES ERROR] Error occured while uploading CONNECT4 logs: %w", err)
+			}
+			fmt.Println("[INFO] Logs uploaded!")
 			logBatch = nil
 		}
 	}
@@ -120,6 +136,8 @@ func Bind4Streamer(
 	ticker := time.NewTicker(time.Duration(logProcessTimeNum) * time.Second)
 	defer ticker.Stop()
 
+	esInstance := elasticsearch.Get()
+
 	// batch of logs
 	var logBatch []models.Bind4Record
 
@@ -136,7 +154,7 @@ func Bind4Streamer(
 				errCh <- fmt.Errorf("[ERROR] Error occured in Bind4Streamer log fetch")
 			}
 
-			fmt.Println("[INFO] Bind4 log received")
+			// fmt.Println("[INFO] Bind4 log received")
 			logBatch = append(logBatch, log)
 
 		case <-ticker.C:
@@ -145,7 +163,12 @@ func Bind4Streamer(
 			}
 
 			fmt.Println("[INFO] Running log batch after 5 sec: ", len(logBatch))
-			fmt.Println(logBatch)
+			if err := elasticsearch.BulkIndex(
+				ctx, esInstance, elasticsearch.Bind4IndexConfig.IndexName, logBatch,
+			); err != nil {
+				errCh <- fmt.Errorf("[ES ERROR] Error occured while uploading BIND4 logs: %w", err)
+			}
+			fmt.Println("[INFO] Logs uploaded!")
 			logBatch = nil
 		}
 	}

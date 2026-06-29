@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"log-ingestion/handlers"
 	"log-ingestion/models"
 	"log-ingestion/pb"
@@ -61,12 +62,19 @@ func RegisterHandlers(grpcServer *grpc.Server, ctx context.Context) {
 	// goroutines
 	streams := []streamerFunc{
 		func() { streamer.DbusStreamer(ctx, dbusLogChan, dbusErrorChan) },
+		func() { LogError(ctx, dbusErrorChan, "DBUS") },
 		func() { streamer.Connect4Streamer(ctx, connect4LogChan, connect4ErrorChan) },
+		func() { LogError(ctx, connect4ErrorChan, "CONNECT4") },
 		func() { streamer.Bind4Streamer(ctx, bind4LogChan, bind4ErrorChan) },
+		func() { LogError(ctx, bind4ErrorChan, "BIND4") },
 		func() { streamer.ISSSStreamer(ctx, isssLogChan, isssErrorChan) },
+		func() { LogError(ctx, isssErrorChan, "ISSS") },
 		func() { streamer.ExecStreamer(ctx, execLogChan, execErrorChan) },
+		func() { LogError(ctx, execErrorChan, "EXEC") },
 		func() { streamer.ExecveStreamer(ctx, execveLogChan, execveErrorChan) },
+		func() { LogError(ctx, execveErrorChan, "EXECVE") },
 		func() { streamer.FanotifyStreamer(ctx, fanotifyLogChan, fanotifyErrorChan) },
+		func() { LogError(ctx, fanotifyErrorChan, "FANOTIFY") },
 	}
 
 	for _, stream := range streams {
@@ -97,4 +105,20 @@ func RegisterHandlers(grpcServer *grpc.Server, ctx context.Context) {
 		close(execveLogChan)
 		close(execveErrorChan)
 	}()
+}
+
+func LogError(ctx context.Context, errCh <-chan error, logName string) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+
+		case err, ok := <-errCh:
+			if !ok {
+				return
+			}
+
+			fmt.Printf("[%s] %v", logName, err)
+		}
+	}
 }

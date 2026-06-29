@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log-ingestion/elasticsearch"
 	"log-ingestion/server"
 	"os"
 	"os/signal"
@@ -27,8 +28,28 @@ func main() {
 		return
 	}
 
+	// ES initialization
+	_, err = elasticsearch.New(elasticsearch.Config{
+		Addresses: []string{"http://es-dev:9200"},
+		Username:  "",
+		Password:  "",
+		CloudId:   "",
+	})
+	if err != nil {
+		fmt.Println("[ERROR] ES connection failed")
+		panic(err)
+	}
+
+	if err = elasticsearch.Get().SetupES(ctx); err != nil {
+		fmt.Println("[ERROR] ES setup failed")
+		panic(err)
+	}
+
 	// server
-	server.InitializeGrpcServer(ctx)
+	if err = server.InitializeGrpcServer(ctx); err != nil {
+		fmt.Println("[ERROR] Server initialization failed")
+		panic(err)
+	}
 
 	sigC := <-sigCh
 	fmt.Printf("[MAIN] Terminating signal recieved: %s\n", sigC)

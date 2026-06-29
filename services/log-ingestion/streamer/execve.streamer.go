@@ -3,6 +3,7 @@ package streamer
 import (
 	"context"
 	"fmt"
+	"log-ingestion/elasticsearch"
 	"log-ingestion/models"
 	"log-ingestion/utils"
 	"os"
@@ -21,6 +22,8 @@ func ExecveStreamer(ctx context.Context, logCh <-chan models.ExecveRecord, errCh
 
 	ticker := time.NewTicker(time.Duration(logProcessTimeNum) * time.Second)
 	defer ticker.Stop()
+
+	esInstance := elasticsearch.Get()
 
 	var logBatch []models.ExecveRecord
 
@@ -41,7 +44,12 @@ func ExecveStreamer(ctx context.Context, logCh <-chan models.ExecveRecord, errCh
 			}
 
 			fmt.Println("[INFO] Running log batch after 5 sec: ", len(logBatch))
-			fmt.Println(logBatch)
+			if err := elasticsearch.BulkIndex(
+				ctx, esInstance, elasticsearch.ExecveIndexConfig.IndexName, logBatch,
+			); err != nil {
+				errCh <- fmt.Errorf("[ES ERROR] Error occured while uploading EXECVE logs: %w", err)
+			}
+			fmt.Println("[INFO] Logs uploaded!")
 			logBatch = nil
 		}
 	}

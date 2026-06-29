@@ -3,6 +3,7 @@ package streamer
 import (
 	"context"
 	"fmt"
+	"log-ingestion/elasticsearch"
 	"log-ingestion/models"
 	"log-ingestion/utils"
 	"os"
@@ -23,6 +24,8 @@ func DbusStreamer(ctx context.Context, logCh <-chan models.DbusUnitRecord, errCh
 	ticker := time.NewTicker(time.Duration(logProcessTimeNum) * time.Second)
 	defer ticker.Stop()
 
+	esInstance := elasticsearch.Get()
+
 	// batch of logs
 	var logBatch []models.DbusUnitRecord
 
@@ -39,7 +42,7 @@ func DbusStreamer(ctx context.Context, logCh <-chan models.DbusUnitRecord, errCh
 				errCh <- fmt.Errorf("[ERROR] Error occured in DbusStreamer log fetch")
 			}
 
-			fmt.Println("[INFO] Dbus log received")
+			// fmt.Println("[INFO] Dbus log received")
 			logBatch = append(logBatch, log)
 
 		case <-ticker.C:
@@ -48,7 +51,13 @@ func DbusStreamer(ctx context.Context, logCh <-chan models.DbusUnitRecord, errCh
 			}
 
 			fmt.Println("[INFO] Running log batch after 5 sec: ", len(logBatch))
-			fmt.Println(logBatch)
+			// fmt.Println(logBatch)
+			if err := elasticsearch.BulkIndex(
+				ctx, esInstance, elasticsearch.DbusIndexConfig.IndexName, logBatch,
+			); err != nil {
+				errCh <- fmt.Errorf("[ES ERROR] Error occured while uploading DBUS logs: %w", err)
+			}
+			fmt.Println("[INFO] Logs uploaded!")
 			logBatch = nil
 		}
 	}

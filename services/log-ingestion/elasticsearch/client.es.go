@@ -17,6 +17,16 @@ type Config struct {
 	CloudId   string
 }
 
+var esInstance *Client
+
+func Get() *Client {
+	if esInstance == nil {
+		panic("[ES ERROR] ES connection is not established")
+	}
+
+	return esInstance
+}
+
 func New(cfg Config) (*Client, error) {
 	esCfg := elasticsearch.Config{
 		Addresses: cfg.Addresses,
@@ -42,5 +52,6 @@ func New(cfg Config) (*Client, error) {
 		return &Client{}, fmt.Errorf("[ES ERROR] ES Ping error: %w", err)
 	}
 
+	esInstance = &Client{ES: res}
 	return &Client{ES: res}, nil
 }

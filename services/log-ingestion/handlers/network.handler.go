@@ -73,6 +73,8 @@ func (s *NetworkUploaderServer) Connect4Upload(stream pb.NetworkLogUploader_Conn
 			return status.Error(codes.Unknown, "[CONNECT4] Error occured while getting log")
 		}
 
+		fmt.Println(chunk.AgentId)
+
 		s.Connect4Stream <- models.Connect4Record{
 			UserFamily: chunk.UserFamily,
 			UserIPv4:   chunk.UserIPv4,
