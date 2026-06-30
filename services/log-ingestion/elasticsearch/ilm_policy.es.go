@@ -14,12 +14,13 @@ const policy = `
 			"hot": {
 				"actions": {
 					"rollover": {
-						"max_size": "10gb"
+						"max_size": "10gb",
+						"max_age": "2m"
 					}
 				}
 			},
 			"delete": {
-				"min_age": "3h",
+				"min_age": "5m",
 				"actions": {
 					"delete": {}
 				}

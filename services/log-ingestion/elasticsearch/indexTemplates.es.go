@@ -43,7 +43,8 @@ func (c *Client) CreateIndexTemplate(
 		"data_stream": {},
 		"template": {
 			"settings": {
-				"index.lifecycle.name": "%s"
+				"index.lifecycle.name": "%s",
+				"index.number_of_replicas": 0
 			},
 			"mappings": %s
 		}
