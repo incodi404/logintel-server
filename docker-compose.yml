@@ -133,6 +133,21 @@ services:
     volumes:
       - ./services/log-ingestion:/app
 
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./services/auth-service
+      target: dev
+    ports:
+      - 7000:7000
+    env_file:
+      - ./services/auth-service/.env
+    depends_on:
+      central_db:
+        condition: service_healthy
+    volumes:
+      - ./services/auth-service:/app
+
 volumes:
   rabbitmq_data:
   rabbitmq_log:

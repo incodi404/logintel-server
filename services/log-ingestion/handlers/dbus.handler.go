@@ -48,6 +48,7 @@ func (s *DbusUnitUploaderServer) DbusUnitUpload(stream pb.DbusUbitUploader_DbusU
 			JobType:     chunk.JobType,
 			JobPath:     chunk.JobPath,
 			Timestamp:   utils.TimestampToUTC(chunk.Timestamp.Seconds, int64(chunk.Timestamp.Nanos)),
+			AgentId:     chunk.AgentId,
 		}
 	}
 }
