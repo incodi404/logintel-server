@@ -21,6 +21,8 @@ services:
   central-db:
     image: postgres:15
     container_name: central-db
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_DB: central_db
       POSTGRES_USER: postgres
@@ -143,7 +145,7 @@ services:
     env_file:
       - ./services/auth-service/.env
     depends_on:
-      central_db:
+      central-db:
         condition: service_healthy
     volumes:
       - ./services/auth-service:/app
