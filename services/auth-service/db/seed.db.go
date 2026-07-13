@@ -51,7 +51,7 @@ func AdminSeed(ctx context.Context) error {
 	}
 
 	fmt.Println("[INFO] Admin has been created")
-	fmt.Printf("[INFO] Username: %s\nAdmin ID: %d\n", adminUser, adminId)
+	fmt.Printf("[INFO] Username: %s & Admin ID: %d\n", adminUser, adminId)
 
 	return nil
 }

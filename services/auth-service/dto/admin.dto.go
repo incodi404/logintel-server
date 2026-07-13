@@ -1,6 +1,6 @@
 package dto
 
 type AdminDto struct {
-	Email    string
-	Password string
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }

@@ -79,6 +79,8 @@ func DbConnect(ctx context.Context) (*pgxpool.Pool, error) {
 		return nil, err
 	}
 
+	fmt.Println("[INFO] PostgreSQL is connected")
+
 	PGPool = pool
 	return pool, nil
 }
