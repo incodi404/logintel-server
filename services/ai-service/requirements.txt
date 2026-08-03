@@ -1,9 +1,0 @@
-fastapi
-pymongo
-uvicorn
-requests
-pydantic
-python-dotenv
-python-multipart
-
-

@@ -1,44 +1,4 @@
 services:
-  mongodb:
-    image: mongo:8
-    container_name: mongodb
-    restart: unless-stopped
-
-    ports:
-      - "27017:27017"
-
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password123
-
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping').ok"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-    volumes:
-      - mongodb_data:/data/db
-
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    restart: unless-stopped
-
-    ports:
-      - "11434:11434"
-
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-    volumes:
-      - ollama_data:/root/.ollama
-
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
@@ -46,8 +6,8 @@ services:
       - 15672:15672
       - 5672:5672
     environment:
-      - RABBITMQ_DEFAULT_USER=user
-      - RABBITMQ_DEFAULT_PASS=password@321
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - rabbitmq_log:/var/log/rabbitmq
@@ -64,9 +24,9 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_DB: central_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - central_db_data:/var/lib/postgresql/data
     healthcheck:
@@ -189,19 +149,6 @@ services:
         condition: service_healthy
     volumes:
       - ./services/auth-service:/app
-
-  ai-service:
-    container_name: ai-service
-    build:
-      context: ./services/ai-service
-      target: dev
-    ports:
-      - 8000:8000
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    volumes:
-      - ./services/ai-service:/app
 
 volumes:
   rabbitmq_data:
