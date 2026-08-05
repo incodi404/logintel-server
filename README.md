@@ -49,25 +49,18 @@ The agent will have a C2 system that allows the admin to run command directly fr
 
 ## Architecture flow
 
+```mermaid
 flowchart LR
 
-Agent --> gRPC
-
-gRPC --> Ingestion
-
-Ingestion --> Elasticsearch
-
-Ingestion --> JetStream
-
-JetStream --> RuleEngine
-
-RuleEngine --> RabbitMQ
-
-RabbitMQ --> Email
-
-RuleEngine --> PostgreSQL
-
-Elasticsearch --> Kibana
+A[Logintel Agent] -->|gRPC| B[Log Ingestion Service]
+B --> C[Elasticsearch]
+B --> D[NATS JetStream]
+D --> E[Rule Engine]
+E --> F[RabbitMQ]
+E --> G[PostgreSQL]
+C --> H[Kibana]
+F --> I[Email Alerts]
+```
 
 ## Technologies
 
