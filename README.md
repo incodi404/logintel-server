@@ -47,6 +47,28 @@ The agent will have a C2 system that allows the admin to run command directly fr
 
 ![Architecture](https://res.cloudinary.com/fwkfpmra/image/upload/v1785779179/server.arch_acqvpa.png)
 
+## Architecture flow
+
+flowchart LR
+
+Agent --> gRPC
+
+gRPC --> Ingestion
+
+Ingestion --> Elasticsearch
+
+Ingestion --> JetStream
+
+JetStream --> RuleEngine
+
+RuleEngine --> RabbitMQ
+
+RabbitMQ --> Email
+
+RuleEngine --> PostgreSQL
+
+Elasticsearch --> Kibana
+
 ## Technologies
 
 ### Golang
