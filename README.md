@@ -1,8 +1,13 @@
 # Logintel Central Server
 
-Logintel is an open source security monitoring and control system. This is used for kernel-level monitoring, command-and-control, alert generating based on rules, storing and visualizing logs efficiently.
+![Go](https://img.shields.io/badge/Go-1.25-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-Active-success)
+![Platform](https://img.shields.io/badge/Linux-Ubuntu-orange)
 
-Logintel Central Server is a SIEM System who is responsible for collecting logs from [Logintel Agent](https://github.com/incodi404/logintel), storing the logs efficiently in Elasticsearch with 3 hours of TTL, connecting with Kibana, generating alerts based on rules, admin and agent management and C2 system.
+Logintel is an open-source SIEM and endpoint monitoring platform that collects Linux kernel events in real time using eBPF, fanotify, and D-Bus, stores them efficiently in Elasticsearch, detects suspicious activities through a rule engine, and provides incident response through an integrated command-and-control (C2) system.
+
+Logintel Central Server is a SIEM System that is responsible for collecting logs from [Logintel Agent](https://github.com/incodi404/logintel), storing the logs efficiently in Elasticsearch with 3 hours of TTL, connecting with Kibana, generating alerts based on rules, admin and agent management and C2 system.
 
 #### The system is still under development and getting better day by day. The first release of the system will be within October, 2026.
 
@@ -25,15 +30,15 @@ Logintel Central Server is a SIEM System who is responsible for collecting logs 
 
 ### Log Ingestion Service
 
-Log ingestion service is responsible for collecting logs from different services via **gRPC**. After collecting logs, it saves the logs in Elasticsearch in different data streams and stream the logs in NATS Jetstream Pub/Sub for fan-out distribution.
+Log ingestion service is responsible for collecting logs from different services via **gRPC**. After collecting logs, it saves the logs in Elasticsearch in different data streams and streams the logs in NATS Jetstream Pub/Sub for fan-out distribution.
 
 ### Kibana
 
-Kibana dashboard is connected with Elasticseach and use for log visualization, filtration and exporting as CSV.
+Kibana dashboard is connected with Elasticseach and used for log visualization, filtration and exporting as CSV.
 
 ### Rule Engine
 
-Rule engine is the heart of this system. This will load rules from PGSQL in every 5 minutes to its memory. It check every log against the rules. If anything suspicious detects then the log will saved with rule metadata in Elasticsearch and PGSQL. Then it will go to RabbitMQ for email alert.
+Rule engine is the heart of this system. This will load rules from PGSQL in every 5 minutes to its memory. It checks every log against the rules. If suspicious activity is detected then the log will saved with rule metadata in Elasticsearch and PGSQL. Then it will go to RabbitMQ for email alert.
 
 ### Auth & Agent Management
 
@@ -83,11 +88,11 @@ The entire project, agent and server, are built with Golang. Golang is very ligh
 
 ### eBPF
 
-eBPF is a technology that let developers run custom code within the kernel without writing any kernel module. It also provide enough security to handle bugs in the kernel, so the kernel will not crash. In this project, eBPF is used to capture kernel events that creates a transparancy which is the best way to understand what actually happend and how it was happened.
+eBPF is a technology that lets developers run custom code within the kernel without writing any kernel module. It also provide enough security to handle bugs in the kernel, so the kernel will not crash. In this project, eBPF is used to capture kernel events that creates a transparency which is the best way to understand what actually happened and how it was happened.
 
 ### fanotify
 
-Fanotify is a kernel notification subsystem that notifies user-space applications when any file events occure in the kernel. It keeps eye on the entire filesystem. It is one of the best choice to track file operarions in a system.
+Fanotify is a kernel notification subsystem that notifies user-space applications when any file events occur in the kernel. It keeps an eye on the entire filesystem. It is one of the best choice to track file operarions in a system.
 
 #### Trade-off
 
@@ -117,7 +122,7 @@ What else should we choose for RDBMS. RBAC structure, command history, agent man
 
 NATS JetStream is the persistence and streaming layer built into NATS, a high-performance messaging system used in distributed applications and microservices. While Core NATS is an in-memory pub/sub system that delivers messages only to active subscribers, JetStream adds durable storage, message replay, acknowledgments, and delivery guarantees.
 
-Integration of Apache Kafka is heavy, latency of RabbitMQ pub/sub is painful. NATS Jetstream provides speed, parsistant storage, guarantee and that are the reason it is here.
+Integration of Apache Kafka is heavy, latency of RabbitMQ pub/sub is painful. NATS Jetstream provides speed, persistent storage, guarantee and that are the reason it is here.
 
 ### RabbitMQ
 
