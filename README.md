@@ -8,8 +8,6 @@ Logintel is an open-source SIEM and endpoint monitoring platform that collects L
 
 Logintel Central Server is a SIEM System that is responsible for collecting logs from [Logintel Agent](https://github.com/incodi404/logintel), storing the logs efficiently in Elasticsearch with 3 hours of TTL, connecting with Kibana, generating alerts based on rules, admin and agent management and C2 system.
 
-#### The system is still under development and getting better day by day. The first release of the system will be within October, 2026.
-
 ## Why A Central Server?
 
 [Logintel Agent](https://github.com/incodi404/logintel) collects events and that's not enough. The logs should be processed and stored efficiently. If anything goes wrong, instead of roaming file to file to get logs, required logs should be at one place. Storing is also not enough, there should be a dynamic rule engine which checks every log and alert before everything goes wrong. It is not only a SIEM system but also integrated command-and-control system which allows the admin to access endpoint system's shell without any extra authentication or any type of fingerprints. The connection is instant and secured with mTLS and also there will be no constant open port.
@@ -162,6 +160,8 @@ There is a planning to add a machine learning-based correlation engine and a RAG
 - ⬜ C2 System
 - ⬜ Admin Panel
 - ⬜ Agent-Server Authentication
+
+#### The system is still under development and getting better day by day. The first release of the system will be within October, 2026.
 
 ## Spin-Up Server with Docker
 
