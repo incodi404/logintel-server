@@ -49,6 +49,8 @@ The agent will have a C2 system that allows the admin to run command directly fr
 
 ## Architecture flow
 
+### Log Ingestion & Processing Flow
+
 ```mermaid
 flowchart LR
 
@@ -60,6 +62,17 @@ E --> F[RabbitMQ]
 E --> G[PostgreSQL]
 C --> H[Kibana]
 F --> I[Email Alerts]
+```
+
+### Command-and-control Flow
+
+```mermaid
+   flowchart LR
+
+A[Browser] -->|WebSocket| B[C2 Service]
+B --> |gRPC Bidirectional Streaming| C[Agent]
+C --> B
+B ---> A
 ```
 
 ## Technologies
