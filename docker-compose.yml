@@ -156,5 +156,3 @@ volumes:
   es-dev-data:
   central_db_data:
   nats_data:
-  mongodb_data:
-  ollama_data:
