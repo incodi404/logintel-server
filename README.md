@@ -1,7 +1,6 @@
 # Logintel Central Server
 
 ![Go](https://img.shields.io/badge/Go-1.25-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
 ![Status](https://img.shields.io/badge/status-Active-success)
 ![Platform](https://img.shields.io/badge/Linux-Ubuntu-orange)
 
