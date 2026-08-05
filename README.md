@@ -42,3 +42,25 @@ The agent will have a C2 system that allows the admin to run command directly fr
 ## Architecture
 
 ![Architecture](https://res.cloudinary.com/fwkfpmra/image/upload/v1785779179/server.arch_acqvpa.png)
+
+## Roadmap for v1
+
+- ✅ Log ingestion from different agents
+- ✅ Storing logs in Elasticsearch
+- ✅ Visualizing logs in Kibana
+- ⬜ Rule Engine
+- ⬜ C2 System
+- ⬜ Admin Panel
+- ⬜ Agent-Server Authentication
+
+## Spin-Up Server with Docker
+
+```shell
+git clone https://github.com/incodi404/logintel-server.git
+cd logintel-server
+docker compose up
+```
+
+## Author
+
+Dipankar Chowdhury — Backend Engineer (Security Focused) | [GitHub](https://github.com/incodi404/) · [LinkedIn](https://www.linkedin.com/in/dipankar-chowdhury/)
