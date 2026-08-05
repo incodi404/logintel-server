@@ -157,8 +157,9 @@ There is a planning to add a machine learning-based correlation engine and a RAG
 - ✅ Storing logs in Elasticsearch
 - ✅ Visualizing logs in Kibana
 - ⬜ Rule Engine
-- ⬜ C2 System
+- ⬜ C2 Service
 - ⬜ Admin Panel
+- ⬜ Agent & Auth Management Service
 - ⬜ Agent-Server Authentication
 
 #### The system is still under development and getting better day by day. The first release of the system will be within October, 2026.
