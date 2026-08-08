@@ -2,9 +2,11 @@ package streamer
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log-ingestion/elasticsearch"
 	"log-ingestion/models"
+	natsjs "log-ingestion/nats-js"
 	"log-ingestion/utils"
 	"os"
 	"strconv"
@@ -23,7 +25,13 @@ func FanotifyStreamer(ctx context.Context, logCh <-chan models.FanotifyRecord, e
 	ticker := time.NewTicker(time.Duration(logProcessTimeNum) * time.Second)
 	defer ticker.Stop()
 
-	esInstance := elasticsearch.Get()
+	// getting instances
+	esInstance := elasticsearch.Get() // es
+	_, js, err := natsjs.Get()
+	if err != nil || js == nil {
+		errCh <- err
+		return
+	}
 
 	var logBatch []models.FanotifyRecord
 
@@ -32,13 +40,27 @@ func FanotifyStreamer(ctx context.Context, logCh <-chan models.FanotifyRecord, e
 		case <-ctx.Done():
 			return
 		case log, ok := <-logCh:
+			// This portion runs in everytime the logCh get a log
 			if !ok {
 				errCh <- fmt.Errorf("[ERROR] Error occured in FanotifyStreamer log fetch")
 			}
 
+			// bathcing in an array
 			logBatch = append(logBatch, log)
 
+			// sending to JS
+			jsonData, err := json.Marshal(log)
+			if err == nil {
+				ack, err := js.Publish(ctx, natsjs.FanotifyDS.Subject, jsonData)
+				if err != nil {
+					errCh <- err
+				}
+
+				fmt.Printf("[FANOTIFY] Stored in %s, sequence %d\n", ack.Stream, ack.Sequence)
+			}
+
 		case <-ticker.C:
+			// This portion runs in interval (default: 5 second)
 			if len(logBatch) == 0 {
 				continue
 			}

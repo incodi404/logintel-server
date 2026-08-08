@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log-ingestion/elasticsearch"
+	natsjs "log-ingestion/nats-js"
 	"log-ingestion/server"
 	"os"
 	"os/signal"
@@ -28,9 +29,22 @@ func main() {
 		return
 	}
 
+	// getting env urls
+	esUrl := os.Getenv("ES_URL")
+	if esUrl == "" {
+		fmt.Println("[ERROR] ES URL not found")
+		return
+	}
+
+	natsUrl := os.Getenv("NATS_URL")
+	if natsUrl == "" {
+		fmt.Println("[ERROR] NATS URL not found")
+		return
+	}
+
 	// ES initialization
 	_, err = elasticsearch.New(elasticsearch.Config{
-		Addresses: []string{"http://es-dev:9200"},
+		Addresses: []string{esUrl},
 		Username:  "",
 		Password:  "",
 		CloudId:   "",
@@ -40,6 +54,7 @@ func main() {
 		panic(err)
 	}
 
+	// creating ILM policy, creating data stream and index template
 	if err = elasticsearch.Get().SetupES(ctx); err != nil {
 		fmt.Println("[ERROR] ES setup failed")
 		panic(err)
@@ -48,6 +63,26 @@ func main() {
 	// server
 	if err = server.InitializeGrpcServer(ctx); err != nil {
 		fmt.Println("[ERROR] Server initialization failed")
+		panic(err)
+	}
+
+	// connect to nats
+	nc, err := natsjs.Connect(natsUrl)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+
+	// connect to js
+	jc, err := natsjs.JSConnect(nc)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+
+	// setting up data streams
+	if err = natsjs.InitDataStream(ctx, jc); err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 
