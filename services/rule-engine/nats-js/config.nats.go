@@ -45,25 +45,26 @@ func JSConnect(nc *nats.Conn) (jetstream.JetStream, error) {
 	return jc, nil
 }
 
-func InitDataStream(ctx context.Context, js jetstream.JetStream) error {
+func InitConsumer(ctx context.Context, js jetstream.JetStream) error {
 	streams := []DataStreamConfig{
-		{Name: ExecDS.Name, Subject: ExecDS.Subject},
-		{Name: ExecveDS.Name, Subject: ExecveDS.Subject},
-		{Name: DbusDS.Name, Subject: DbusDS.Subject},
-		{Name: Connect4DS.Name, Subject: Connect4DS.Subject},
-		{Name: Bind4DS.Name, Subject: Bind4DS.Subject},
-		{Name: ISSSDS.Name, Subject: ISSSDS.Subject},
-		{Name: FanotifyDS.Name, Subject: FanotifyDS.Subject},
+		{Name: ExecDS.Name, Durable: ExecDS.Durable},
+		{Name: ExecveDS.Name, Durable: ExecveDS.Durable},
+		{Name: DbusDS.Name, Durable: DbusDS.Durable},
+		{Name: Connect4DS.Name, Durable: Connect4DS.Durable},
+		{Name: Bind4DS.Name, Durable: Bind4DS.Durable},
+		{Name: ISSSDS.Name, Durable: ISSSDS.Durable},
+		{Name: FanotifyDS.Name, Durable: FanotifyDS.Durable},
 	}
 
 	for _, s := range streams {
-		_, err := js.CreateOrUpdateStream(ctx, jetstream.StreamConfig{
-			Name:     s.Name,
-			Subjects: []string{s.Subject},
+		_, err := js.CreateOrUpdateConsumer(ctx, s.Name, jetstream.ConsumerConfig{
+			Durable:       s.Durable,
+			DeliverPolicy: jetstream.DeliverAllPolicy,
+			AckPolicy:     jetstream.AckExplicitPolicy,
 		})
 
 		if err != nil {
-			return fmt.Errorf("[ERROR] Error creating stream: %w", err)
+			return fmt.Errorf("[ERROR] Error creating consumer: %w", err)
 		}
 	}
 

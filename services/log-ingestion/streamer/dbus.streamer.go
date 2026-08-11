@@ -2,9 +2,11 @@ package streamer
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log-ingestion/elasticsearch"
 	"log-ingestion/models"
+	natsjs "log-ingestion/nats-js"
 	"log-ingestion/utils"
 	"os"
 	"strconv"
@@ -25,6 +27,11 @@ func DbusStreamer(ctx context.Context, logCh <-chan models.DbusUnitRecord, errCh
 	defer ticker.Stop()
 
 	esInstance := elasticsearch.Get()
+	_, js, err := natsjs.Get()
+	if err != nil || js == nil {
+		errCh <- err
+		return
+	}
 
 	// batch of logs
 	var logBatch []models.DbusUnitRecord
@@ -42,9 +49,17 @@ func DbusStreamer(ctx context.Context, logCh <-chan models.DbusUnitRecord, errCh
 				errCh <- fmt.Errorf("[ERROR] Error occured in DbusStreamer log fetch")
 			}
 
-			// fmt.Println("[INFO] Dbus log received")
 			logBatch = append(logBatch, log)
 
+			jsonData, err := json.Marshal(log)
+			if err == nil {
+				ack, err := js.Publish(ctx, natsjs.DbusDS.Subject, jsonData)
+				if err != nil {
+					errCh <- err
+				}
+
+				fmt.Printf("[DBUS] Stored in %s, sequence %d\n", ack.Stream, ack.Sequence)
+			}
 		case <-ticker.C:
 			if len(logBatch) == 0 {
 				continue

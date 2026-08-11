@@ -10,42 +10,42 @@ var (
 	ExecDS = DataStreamConfig{
 		Name:    "LOGEXEC",
 		Subject: "log.exec.>",
-		Durable: "",
+		Durable: "exec",
 	}
 
 	ExecveDS = DataStreamConfig{
 		Name:    "LOGEXECVE",
 		Subject: "log.execve.>",
-		Durable: "",
+		Durable: "execve",
 	}
 
 	DbusDS = DataStreamConfig{
 		Name:    "LOGDBUS",
 		Subject: "log.dbus.>",
-		Durable: "",
+		Durable: "dbus",
 	}
 
 	Connect4DS = DataStreamConfig{
 		Name:    "LOGCONNECT4",
 		Subject: "log.connect4.>",
-		Durable: "",
+		Durable: "connect4",
 	}
 
 	Bind4DS = DataStreamConfig{
 		Name:    "LOGBIND4",
 		Subject: "log.bind4.>",
-		Durable: "",
+		Durable: "bind4",
 	}
 
 	ISSSDS = DataStreamConfig{
 		Name:    "LOGISSS",
 		Subject: "log.isss.>",
-		Durable: "",
+		Durable: "isss",
 	}
 
 	FanotifyDS = DataStreamConfig{
 		Name:    "LOGFANOTIFY",
 		Subject: "log.fanotify.>",
-		Durable: "",
+		Durable: "fanotify",
 	}
 )
