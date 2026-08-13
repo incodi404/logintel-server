@@ -14,12 +14,12 @@ var NatsJSInstance jetstream.JetStream
 func Get() (*nats.Conn, jetstream.JetStream, error) {
 	// nats
 	if NatsInstance == nil {
-		return nil, nil, fmt.Errorf("[ERROR] NATS connection is not initialized yet")
+		return nil, nil, fmt.Errorf("[ERROR] NATS connection is not initialized yet\n")
 	}
 
 	// js
 	if NatsJSInstance == nil {
-		return NatsInstance, nil, fmt.Errorf("[ERROR] JetStream connection is not initialized yet")
+		return NatsInstance, nil, fmt.Errorf("[ERROR] JetStream connection is not initialized yet\n")
 	}
 
 	return NatsInstance, NatsJSInstance, nil
@@ -32,6 +32,7 @@ func Connect(url string) (*nats.Conn, error) {
 	}
 
 	NatsInstance = nc
+	fmt.Println("[INFP] NATS is connected")
 	return nc, nil
 }
 
@@ -42,6 +43,7 @@ func JSConnect(nc *nats.Conn) (jetstream.JetStream, error) {
 	}
 
 	NatsJSInstance = jc
+	fmt.Println("[INFP] Jetstream is connected")
 	return jc, nil
 }
 
@@ -62,10 +64,14 @@ func InitDataStream(ctx context.Context, js jetstream.JetStream) error {
 			Subjects: []string{s.Subject},
 		})
 
+		fmt.Printf("[INFP] Streams created: %s\n", s.Name)
+
 		if err != nil {
 			return fmt.Errorf("[ERROR] Error creating stream: %w", err)
 		}
 	}
+
+	fmt.Println("[INFP] Streams are connected")
 
 	return nil
 }

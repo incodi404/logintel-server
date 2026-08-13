@@ -26,7 +26,7 @@ func InitializeGrpcServer(ctx context.Context) error {
 	// register
 	RegisterHandlers(grpcServer, ctx)
 
-	fmt.Println("[INFO] Server is listening on 5051 abcdwdc")
+	fmt.Println("[INFO] Server is listening on 5051")
 	if err = grpcServer.Serve(list); err != nil {
 		return fmt.Errorf("[SERVER] Error serving gRPC server: %w", err)
 	}

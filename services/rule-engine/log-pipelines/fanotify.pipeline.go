@@ -16,7 +16,7 @@ func FanotifyProcesser(ctx context.Context, errCh chan<- error, dataCh <-chan mo
 		case log, ok := <-dataCh:
 			if !ok {
 				errCh <- fmt.Errorf("[ERROR] Error fetching log")
-				continue
+				return
 			}
 
 			fmt.Println("[RECEIVED] Fanotify Log Received!")
@@ -38,6 +38,7 @@ func FanotifyPipeline(ctx context.Context, errCh chan<- error, wg *sync.WaitGrou
 
 	go func() {
 		defer wg.Done()
+		defer close(dataCh)
 		// consumer
 		natsjs.LogConsumer(ctx, js, &natsjs.FanotifyDS, errCh, dataCh)
 	}()
@@ -47,8 +48,4 @@ func FanotifyPipeline(ctx context.Context, errCh chan<- error, wg *sync.WaitGrou
 		// processor
 		FanotifyProcesser(ctx, errCh, dataCh)
 	}()
-
-	if len(dataCh) == 0 {
-		close(dataCh)
-	}
 }

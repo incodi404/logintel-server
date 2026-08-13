@@ -60,12 +60,6 @@ func main() {
 		panic(err)
 	}
 
-	// server
-	if err = server.InitializeGrpcServer(ctx); err != nil {
-		fmt.Println("[ERROR] Server initialization failed")
-		panic(err)
-	}
-
 	// connect to nats
 	nc, err := natsjs.Connect(natsUrl)
 	if err != nil {
@@ -83,6 +77,12 @@ func main() {
 	// setting up data streams
 	if err = natsjs.InitDataStream(ctx, jc); err != nil {
 		fmt.Println(err)
+		panic(err)
+	}
+
+	// server
+	if err = server.InitializeGrpcServer(ctx); err != nil {
+		fmt.Println("[ERROR] Server initialization failed")
 		panic(err)
 	}
 

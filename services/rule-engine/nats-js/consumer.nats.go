@@ -16,45 +16,29 @@ func LogConsumer[T any](ctx context.Context, js jetstream.JetStream, dataStreamC
 		return
 	}
 
-	info, err := cons.Info(ctx)
-	if err != nil {
-		errCh <- fmt.Errorf("[NATS] Error getting message info from consumer: %w", err)
-		return
-	}
+	fmt.Println("[NATS] Block 1 Consumer [2]")
 
-	pending := info.NumPending
-	if pending == 0 {
-		fmt.Println("[INFO] Nothing is pending")
-		return
-	}
-
-	msgs, err := cons.Fetch(int(pending))
-	if err != nil {
-		errCh <- fmt.Errorf("[NATS] Error getting messages from consumer: %w", err)
-		return
-	}
-
-	for msg := range msgs.Messages() {
+	consCtx, err := cons.Consume(func(msg jetstream.Msg) {
 		var log T
-
-		meta, err := msg.Metadata()
-		if err != nil {
-			errCh <- fmt.Errorf("[NATS] Error getting message metadata: %w", err)
-			continue
-		}
-
 		if err = json.Unmarshal(msg.Data(), &log); err != nil {
 			errCh <- fmt.Errorf("[NATS] Error unmarshal data: %w", err)
-			continue
 		}
+
+		fmt.Println("[NATS] Got a new message!")
+
+		dataCh <- log // sending to channel
 
 		// Acknowledge so the server advances the consumer past this message.
 		if err := msg.Ack(); err != nil {
 			errCh <- fmt.Errorf("[NATS] Error ack data: %w", err)
-			continue
 		}
-
-		fmt.Printf("[NATS] Stream seq: %d, Consumer seq: %d\n", meta.Sequence.Stream, meta.Sequence.Consumer)
-		dataCh <- log // sending to channel
+	})
+	if err != nil {
+		errCh <- fmt.Errorf("[NATS] Error getting message: %w", err)
+		return
 	}
+
+	defer consCtx.Stop()
+
+	<-ctx.Done() // Keep this LogConsumer function alive until the parent context is cancelled. It keeps the function alive and waits until the parent ctx is cancelled.
 }

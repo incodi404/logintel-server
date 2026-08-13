@@ -135,6 +135,23 @@ services:
     volumes:
       - ./services/log-ingestion:/app
 
+  rule-engine:
+    container_name: rule-engine
+    build:
+      context: ./services/rule-engine
+      target: dev
+    env_file:
+      - ./services/rule-engine/.env
+    depends_on:
+      central-db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    volumes:
+      - ./services/rule-engine:/app
+
   auth-service:
     container_name: auth-service
     build:

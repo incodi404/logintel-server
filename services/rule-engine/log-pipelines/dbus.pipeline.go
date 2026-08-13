@@ -16,7 +16,7 @@ func DbusProcesser(ctx context.Context, errCh chan<- error, dataCh <-chan models
 		case log, ok := <-dataCh:
 			if !ok {
 				errCh <- fmt.Errorf("[ERROR] Error fetching log")
-				continue
+				return
 			}
 
 			fmt.Println("[RECEIVED] Dbus Log Received!")
@@ -38,6 +38,7 @@ func DbusPipeline(ctx context.Context, errCh chan<- error, wg *sync.WaitGroup) {
 
 	go func() {
 		defer wg.Done()
+		defer close(dataCh)
 		// consumer
 		natsjs.LogConsumer(ctx, js, &natsjs.DbusDS, errCh, dataCh)
 	}()
@@ -47,8 +48,4 @@ func DbusPipeline(ctx context.Context, errCh chan<- error, wg *sync.WaitGroup) {
 		// processor
 		DbusProcesser(ctx, errCh, dataCh)
 	}()
-
-	if len(dataCh) == 0 {
-		close(dataCh)
-	}
 }

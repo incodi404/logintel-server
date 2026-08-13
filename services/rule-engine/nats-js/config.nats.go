@@ -32,6 +32,7 @@ func Connect(url string) (*nats.Conn, error) {
 	}
 
 	NatsInstance = nc
+	fmt.Println("[INFP] NATS is connected")
 	return nc, nil
 }
 
@@ -42,6 +43,7 @@ func JSConnect(nc *nats.Conn) (jetstream.JetStream, error) {
 	}
 
 	NatsJSInstance = jc
+	fmt.Println("[INFP] Jetstream is connected")
 	return jc, nil
 }
 
@@ -67,6 +69,8 @@ func InitConsumer(ctx context.Context, js jetstream.JetStream) error {
 			return fmt.Errorf("[ERROR] Error creating consumer: %w", err)
 		}
 	}
+
+	fmt.Println("[INFP] Consumers are connected")
 
 	return nil
 }
