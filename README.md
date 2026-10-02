@@ -43,7 +43,6 @@ flowchart LR
 A[Logintel Agent] -->|gRPC| B[Log Ingestion Service]
 B --> C[Elasticsearch]
 B --> D[NATS JetStream]
-E --> G[PostgreSQL]
 C --> H[Kibana]
 ```
 
