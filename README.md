@@ -43,22 +43,8 @@ flowchart LR
 A[Logintel Agent] -->|gRPC| B[Log Ingestion Service]
 B --> C[Elasticsearch]
 B --> D[NATS JetStream]
-D --> E[Rule Engine]
-E --> F[RabbitMQ]
 E --> G[PostgreSQL]
 C --> H[Kibana]
-F --> I[Email Alerts]
-```
-
-### Command-and-control Flow
-
-```mermaid
-   flowchart LR
-
-A[Browser] -->|WebSocket| B[C2 Service]
-B --> |gRPC Bidirectional Streaming| C[Agent]
-C --> B
-B ---> A
 ```
 
 ## Technologies
